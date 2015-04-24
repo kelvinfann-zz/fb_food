@@ -1,8 +1,11 @@
 from django.db import models
+from django.utils import timezone
 
 class Event(models.Model):
-	date = models.DateTimeField('date of event')
-	name = models.CharField(max_length=200)
+	start_time = models.DateTimeField('start of event', default=timezone.now)
+	end_time = models.DateTimeField('end time of event', default=timezone.now)
+	name = models.CharField(max_length=300)
+	fb_id = models.IntegerField(default=-1)
 
 	def __str__(self):
 		return self.event_name

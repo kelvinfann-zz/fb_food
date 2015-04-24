@@ -26,4 +26,10 @@ def get_event(id):
 	return event_details
 
 def upcoming_events_parser(upcoming_events):
-	return upcoming_events
+	if type(upcoming_events) == type(dict): 
+		upcoming_events = upcoming_events["data"]
+	for event_short in upcoming_events:
+		event_full = get_event(event_short["id"])
+		add_event(event_full)
+
+
