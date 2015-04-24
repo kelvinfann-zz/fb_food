@@ -1,0 +1,11 @@
+{% if vendor %}
+<h1>{{ vendor.name }}</h1>
+	<u1>
+	<a href="../">..</a>
+	{% for event in vendor_events %}
+		<li><a href='../../e/{{ event.id }}'>{{ event.name }}</a></li>
+	{% endfor %}
+	</u1>
+{% else %}
+	<p>No such vendor</p>
+{% endif %}

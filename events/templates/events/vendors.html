@@ -1,7 +1,8 @@
 {% if vendors %}
 	<u1>
+	<a href="../">..</a>
 	{% for vendor in vendors %}
-		<li>{{ vendor.name }}</li>
+		<li><a href="./{{ vendor.id }}">{{ vendor.name }}</a></li>
 	{% endfor %}
 	</u1>
 {% else %}
