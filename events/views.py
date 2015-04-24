@@ -35,9 +35,11 @@ def events(request):
 
 def event(request, event_id):
 	event = Event.objects.get(id=event_id)
+	event_date = event.start_time.date()
 	event_vendors = event.vendor_set.all()
 	context = {
 		'event': event,
+		'event_date': event_date,
 		'event_vendors': event_vendors,
 	}
 	return render(request, 'events/event.html', context)
