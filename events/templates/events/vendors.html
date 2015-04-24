@@ -1,0 +1,9 @@
+{% if vendors %}
+	<u1>
+	{% for vendor in vendors %}
+		<li>{{ vendor.name }}</li>
+	{% endfor %}
+	</u1>
+{% else %}
+	<p>No Vendors</p>
+{% endif %}

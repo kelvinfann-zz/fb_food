@@ -1,0 +1,9 @@
+{% if events %}
+	<u1>
+	{% for event in events %}
+		<li>{{ event.name }}</li>
+	{% endfor %}
+	</u1>
+{% else %}
+	<p>No event</p>
+{% endif %}
