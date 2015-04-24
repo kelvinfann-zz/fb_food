@@ -1,6 +1,8 @@
 from urllib2 import urlopen
 try: from simplejson import loads
 except ImportError: from json import loads
+from .models import Event, Vendor
+from datetime import datetime
 
 APP_ID = '1829549720604413'
 APP_SECRET = '1104f306c16d5bc27665e9faa6d1d265'
@@ -16,20 +18,52 @@ ALL_EVENTS_URL += ('/' + PARAMETERS)
 
 def get_upcoming_events():
 	upcoming_events = loads(urlopen(ALL_EVENTS_URL).read())
-	return upcoming_events
+	return _get_upcoming_events(upcoming_events)
 
-def get_event(id):
-	if type(id) == type(int):
-		id = str(id)
-	event_url = FACEBOOK_GRAPH_URL + '/' + id + '/?' + ACCESS_TOKEN
-	event_details = loads(urlopen(event_url).read())
-	return event_details
+def get_event(fb_id):
+	if type(fb_id) == type(int):
+		fb_id = str(fb_id)
+	event_url = FACEBOOK_GRAPH_URL + '/' + fb_id + '/?' + ACCESS_TOKEN
+	fb_event_details = loads(urlopen(event_url).read())
+	return fb_event_details
 
-def upcoming_events_parser(upcoming_events):
-	if type(upcoming_events) == type(dict): 
-		upcoming_events = upcoming_events["data"]
-	for event_short in upcoming_events:
-		event_full = get_event(event_short["id"])
-		add_event(event_full)
+def fb_date_parser(fb_date):
+	fb_date_split = fb_date.split('T')
+	date_split, time_split = fb_date_split[0].split('-'), fb_date_split[1].split(':')
+	year, month, day = int(date_split[0]), int(date_split[1]), int(date_split[2])
+	hour, minute = int(time_split[0]), int(time_split[1])
+	return datetime(year, month, day, hour=hour, minute=minute)
 
+def is_valid_vendor_list(vendors_list, n=2, vendor_name_length=30):
+	i = 0
+	for vendor in vendors_list:
+		if len(vendor) > vendor_name_length: 
+			i+=1
+	return i <= n
+
+def description_vendor_parser(fb_event_description):
+	n_description = fb_event_description.replace('\r\n', '\n').replace(': \n', ':\n').split(':\n')[1:]
+	n_broke_description = [item.split('\n\n')[0].split('\n') for item in n_description]
+	valid_vendor_list = list()
+	for section in n_broke_description:
+		if is_valid_vendor_list(section):
+			valid_vendor_list += [section]
+	if len(valid_vendor_list) != 1: return None
+	return valid_vendor_list[0]			 
+
+def add_event(fb_event):
+	same_event = Event.objects.all().filter(fb_id=fb_event["id"])
+	if not same_event:
+		Event.objects.create(
+			name=fb_event["name"][:300],
+			fb_id=fb_event["id"],	
+			start_time=fb_date_parser(fb_event["start_time"]),
+			end_time=fb_date_parser(fb_event["end_time"]),
+			)
+	return description_vendor_parser(fb_event["description"])
+
+def _get_upcoming_events(upcoming_events):
+#	if type(upcoming_events) == type(dict): 
+#		upcoming_events = upcoming_events["data"]
+	return [add_event(get_event(fb_event_short["id"])) for fb_event_short in upcoming_events["data"]]
 
