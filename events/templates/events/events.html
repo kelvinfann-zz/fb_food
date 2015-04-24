@@ -1,10 +1,11 @@
 {% if events %}
+<h1>Events!</h1>
 	<u1>
 	<a href="../">..</a>
 	{% for event in events %}
-		<li><a href='../e/{{event.id}}'>{{ event.name }}</a></li>
+		<li><a href="../e/{{ event.id }}">{{ event.name }}</a></li>
 	{% endfor %}
 	</u1>
 {% else %}
-	<p>No event</p>
+	<p>No events</p>
 {% endif %}

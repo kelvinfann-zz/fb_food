@@ -12,7 +12,8 @@ class Event(models.Model):
 
 class Vendor(models.Model):
 	name = models.CharField(max_length=50)
-	events = models.ManyToManyField(Event)	
+	events = models.ManyToManyField(Event)
+	freq = models.IntegerField(default=0)	
 
 	def __str__(self):
 		return self.name

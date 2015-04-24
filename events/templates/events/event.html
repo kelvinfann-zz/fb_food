@@ -1,5 +1,6 @@
 {% if event %}
 <h1>{{ event.name }}</h1>
+<h2>{{ event.start_time}} - {{ event.end_time }}</h2>
 	<u1>
 		<a href="../../u/">..</a>
 		{% for vendor in event_vendors %}

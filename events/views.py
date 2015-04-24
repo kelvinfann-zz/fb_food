@@ -1,8 +1,9 @@
+import datetime
 from django.shortcuts import render
 from django.http import HttpResponse
 
 from .models import Event, Vendor
-from .fb_fetch import get_upcoming_events 
+from .fb_fetch import update, get_recent_appearances
 # Create your views here.
 
 def index(request):
@@ -10,7 +11,7 @@ def index(request):
 	return render(request, 'events/index.html', context)
 
 def vendors(request):
-	vendors = Vendor.objects.order_by('name')
+	vendors = Vendor.objects.order_by('-freq')
 	context = {
 		'vendors': vendors,
 	}
@@ -18,7 +19,7 @@ def vendors(request):
 
 def vendor(request, vendor_id):
 	vendor = Vendor.objects.get(id=vendor_id)
-	vendor_events = vendor.events.all()
+	vendor_events = get_recent_appearances(vendor)
 	context = {
 		'vendor': vendor,
 		'vendor_events': vendor_events,
@@ -26,7 +27,7 @@ def vendor(request, vendor_id):
 	return render(request, 'events/vendor.html', context)
 
 def events(request):
-	events = Event.objects.order_by('start_time')
+	events = Event.objects.filter(start_time__gt=datetime.datetime.now()).order_by('start_time')
 	context = {
 		'events': events
 	}		
@@ -42,8 +43,8 @@ def event(request, event_id):
 	return render(request, 'events/event.html', context)
 
 def get_events(request):
-	events = get_upcoming_events()
+	is_updated = update()
 	context = {
-		'events': events
+		'is_updated': is_updated
 	}
-	return render(request, 'events/events.html', context)
+	return render(request, 'events/is_updated.html', context)
