@@ -42,7 +42,7 @@ def is_valid_vendor_list(vendors_list, n=2, vendor_name_length=30):
 	return i <= n
 
 def description_vendor_parser(fb_event_description):
-	n_description = fb_event_description.replace('\r\n', '\n').replace(': \n', ':\n').split(':\n')[1:]
+	n_description = fb_event_description.replace('\r\n', '\n').replace(' \n', '\n').replace('\n ', '\n').split(':\n')[1:]
 	n_broke_description = [item.split('\n\n')[0].split('\n') for item in n_description]
 	valid_vendor_list = list()
 	for section in n_broke_description:
@@ -51,19 +51,34 @@ def description_vendor_parser(fb_event_description):
 	if len(valid_vendor_list) != 1: return None
 	return valid_vendor_list[0]			 
 
+def add_vendor_event(vendor, db_event):
+	db_vendor = Vendor.objects.all().filter(name=vendor)
+	if vendor == '': return
+	if not db_vendor:
+		db_vendor = Vendor(
+				name=vendor,				
+			)
+		db_vendor.save()
+	else:
+		if len(db_vendor) > 1: raise Exception('Duplicate Vendor')
+		db_vendor = db_vendor[0]
+	db_vendor.events.add(db_event)
+	
 def add_event(fb_event):
 	same_event = Event.objects.all().filter(fb_id=fb_event["id"])
 	if not same_event:
-		Event.objects.create(
+		new_event = Event(
 			name=fb_event["name"][:300],
 			fb_id=fb_event["id"],	
 			start_time=fb_date_parser(fb_event["start_time"]),
 			end_time=fb_date_parser(fb_event["end_time"]),
 			)
-	return description_vendor_parser(fb_event["description"])
+		new_event.save()
+		vendors = description_vendor_parser(fb_event["description"])
+		if vendors != None:
+			for vendor in vendors:
+				add_vendor_event(vendor, new_event)	
 
 def _get_upcoming_events(upcoming_events):
-#	if type(upcoming_events) == type(dict): 
-#		upcoming_events = upcoming_events["data"]
 	return [add_event(get_event(fb_event_short["id"])) for fb_event_short in upcoming_events["data"]]
 

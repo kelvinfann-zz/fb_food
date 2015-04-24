@@ -15,4 +15,4 @@ class Vendor(models.Model):
 	events = models.ManyToManyField(Event)	
 
 	def __str__(self):
-		return self.vendor_name
+		return self.name
