@@ -50,3 +50,5 @@ def get_events(request):
 		'is_updated': is_updated
 	}
 	return render(request, 'events/is_updated.html', context)
+
+

@@ -51,7 +51,7 @@ def add_event(fb_event):
 				add_vendor_event(vendor, new_event)	
 
 def add_vendor_event(vendor, db_event):
-	db_vendor = Vendor.objects.all().filter(name=vendor)
+	db_vendor = Vendor.objects.filter(name=vendor)
 	if vendor == '': return
 	if not db_vendor:
 		db_vendor = Vendor(
