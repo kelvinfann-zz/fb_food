@@ -4,8 +4,8 @@ try: from simplejson import loads
 except ImportError: from json import loads
 from .models import Event, Vendor
 
-APP_ID = '1829549720604413'
-APP_SECRET = '1104f306c16d5bc27665e9faa6d1d265'
+APP_ID = 'REMOVED'
+APP_SECRET = 'REMOVED'
 OFF_THE_GRID_EVENTS_URL = 'OffTheGridSF/events'
 FACEBOOK_GRAPH_URL = 'graph.facebook.com'
 
